@@ -2,7 +2,6 @@ package coinmarketcap
 
 import (
 	"data-fetcher/internal"
-	coinmarketmapper "data-fetcher/internal/mapper/coinmarket"
 	"data-fetcher/internal/model/api/coinmarket"
 	"encoding/json"
 	"errors"
@@ -12,6 +11,7 @@ import (
 	"net/http"
 
 	coinMarketConfig "data-fetcher/config/api/coinmarketcap"
+	coinmarketmapper "data-fetcher/internal/mapper/coinmarket"
 )
 
 type coinMarketService struct {

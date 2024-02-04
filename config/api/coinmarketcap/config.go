@@ -9,10 +9,14 @@ import (
 type CoinMarketConfig struct {
 	CoinMarketUrl       string `env:"COIN_MARKET_CAP"`
 	CoinMarketHeaderKey string `env:"COIN_MARKET_HEADER_KEY"`
+	CoinMarketToken     string `env:"COIN_MARKET_TOKEN"`
 }
 
 func NewConfig() (*CoinMarketConfig, error) {
 	if err := godotenv.Load("config/.env"); err != nil {
+		log.Print("No .env file found")
+	}
+	if err := godotenv.Load("config/token.env"); err != nil {
 		log.Print("No .env file found")
 	}
 	cfg := CoinMarketConfig{}
