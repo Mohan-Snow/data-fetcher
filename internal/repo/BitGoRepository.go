@@ -2,6 +2,7 @@ package repo
 
 import (
 	"data-fetcher/internal"
+	"data-fetcher/internal/model/repo"
 	"database/sql"
 )
 
@@ -15,20 +16,21 @@ func NewBitGoRepository(db *sql.DB) internal.PostgresRepo {
 	}
 }
 
-func (r postgresRepo) Save(data string) error {
-	_, err := r.db.Exec("INSERT INTO test_data(data) VALUES ($1)", data)
+func (r postgresRepo) Save(entity *repo.CmEntity) error {
+	_, err := r.db.Exec("INSERT INTO currency(COIN_NAME, PRICE_USD, LAST_UPDATED) VALUES ($1,$2,$3)",
+		entity.CoinName, entity.PriceUsd, entity.LastUpdated)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r postgresRepo) GetById(id int) (string, error) {
+func (r postgresRepo) GetById(id int) (*repo.CmEntity, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (r postgresRepo) GetAll() (string, error) {
+func (r postgresRepo) GetAll() ([]*repo.CmEntity, error) {
 	//TODO implement me
 	panic("implement me")
 }

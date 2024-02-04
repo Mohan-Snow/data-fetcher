@@ -50,7 +50,7 @@ func main() {
 		DisableCompression: true,
 	}
 	coinMarketService := coinmarketcap.NewCoinMarketService(repository, *cmConfig, tr)
-	data, err := coinMarketService.FetchDataAndSave("BTC", "")
+	data, err := coinMarketService.FetchDataAndSave("BTC", "315a9dee-c83f-46f7-8c67-888841ed010d")
 	if err != nil {
 		fmt.Println(err)
 	}

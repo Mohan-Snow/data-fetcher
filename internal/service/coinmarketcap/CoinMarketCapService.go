@@ -2,6 +2,8 @@ package coinmarketcap
 
 import (
 	"data-fetcher/internal"
+	coinmarketmapper "data-fetcher/internal/mapper/coinmarket"
+	"data-fetcher/internal/model/api/coinmarket"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -37,29 +39,49 @@ func (c *coinMarketService) FetchDataAndSave(symbols string, token string) (stri
 	requestURL := fmt.Sprintf("%s%s?symbol=%s", c.cmConfig.CoinMarketUrl, "/cryptocurrency/quotes/latest", symbols)
 	log.Printf("Retrieve data from: %s\n", requestURL)
 
-	req, err := http.NewRequest(http.MethodGet, requestURL, nil)
+	resp, err := c.doRequest(requestURL, token)
+	defer resp.Body.Close()
 	if err != nil {
 		return "", err
+	}
+
+	data, err := io.ReadAll(resp.Body)
+	cmDto, err := c.unmarshalResponse(&data)
+	if err != nil {
+		return "", err
+	}
+
+	entity, err := coinmarketmapper.MapDtoToEntity(cmDto)
+	if err != nil {
+		return "", err
+	}
+
+	err = c.repo.Save(entity)
+	if err != nil {
+		return "", err
+	}
+	return "Data fetched and saved", nil
+}
+
+func (c *coinMarketService) doRequest(url string, token string) (*http.Response, error) {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
 	}
 	req.Header.Add(c.cmConfig.CoinMarketHeaderKey, token)
 	req.Header.Add("Accept", "application/json")
 	response, err := c.client.Do(req)
-	defer response.Body.Close()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
+	return response, nil
+}
 
-	var objmap map[string]json.RawMessage
-	data, err := io.ReadAll(response.Body)
+func (c *coinMarketService) unmarshalResponse(body *[]byte) (*coinmarket.CmDto, error) {
+	var cmDto coinmarket.CmDto
+	err := json.Unmarshal(*body, &cmDto)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	err = json.Unmarshal(data, &objmap)
-	if err != nil {
-		return "", err
-	}
-	bs, _ := json.Marshal(&objmap)
-	fmt.Println(string(bs))
-
-	return "", nil
+	return &cmDto, nil
 }
