@@ -43,14 +43,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	repository := repo.NewBitGoRepository(db)
+	repository := repo.NewCurrencyRepository(db)
 	tr := &http.Transport{
 		MaxIdleConns:       10,
 		IdleConnTimeout:    30 * time.Second,
 		DisableCompression: true,
 	}
 	coinMarketService := coinmarketcap.NewCoinMarketService(repository, *cmConfig, tr)
-	data, err := coinMarketService.FetchDataAndSave("ETH", cmConfig.CoinMarketToken)
+	data, err := coinMarketService.FetchDataAndSave("ETH", cmConfig.CoinMarketToken) //  BTC ETH
 	if err != nil {
 		fmt.Println(err)
 	}
