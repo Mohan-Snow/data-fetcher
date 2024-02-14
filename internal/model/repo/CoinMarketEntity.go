@@ -2,7 +2,7 @@ package repo
 
 import "time"
 
-type CmEntity struct {
+type CoinMarketEntity struct {
 	CoinName    string
 	PriceUsd    string
 	LastUpdated time.Time
