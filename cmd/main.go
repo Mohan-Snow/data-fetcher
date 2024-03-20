@@ -50,8 +50,8 @@ func main() {
 		DisableCompression: true,
 	}
 	service := coinmarketcap.NewCoinMarketService(repository, *cmConfig, tr)
-	//data, err := service.FetchDataAndSave("ETH", cmConfig.CoinMarketToken) //  BTC ETH
-	data, err := service.FetchAllData()
+	data, err := service.FetchDataAndSave("ETH", cmConfig.CoinMarketToken) //  BTC ETH
+	//data, err := service.FetchAllData()
 	if err != nil {
 		fmt.Println(err)
 	}
