@@ -49,14 +49,14 @@ func (r postgresRepo) Save(entity *repo.CoinMarketEntity) error {
 		_, err := sq.Update(
 			"currency",
 		).Set(
-			"price_usd", existingCoin.PriceUsd,
+			"price_usd", entity.PriceUsd,
 		).Set(
-			"last_updated", existingCoin.LastUpdated,
-		).Where(sq.Eq{"coin_name": existingCoin.CoinName}).RunWith(r.db).Exec()
+			"last_updated", entity.LastUpdated,
+		).Where(sq.Eq{"coin_name": existingCoin.CoinName}).PlaceholderFormat(sq.Dollar).RunWith(r.db).Exec()
 		if err != nil {
 			return err
 		}
-		fmt.Printf("Coin %s updated successfully.", existingCoin.CoinName)
+		fmt.Printf("Coin %s updated successfully.\n", existingCoin.CoinName)
 	}
 	return err
 }
@@ -97,7 +97,7 @@ func (r postgresRepo) findCoin(coinName string) (*repo.CoinMarketEntity, error) 
 	).Where(
 		sq.Eq{"coin_name": coinName},
 	)
-	stmt, args, err := query.ToSql()
+	stmt, args, err := query.PlaceholderFormat(sq.Dollar).ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -106,8 +106,11 @@ func (r postgresRepo) findCoin(coinName string) (*repo.CoinMarketEntity, error) 
 	if err != nil {
 		return nil, err
 	}
-	if err := row.Scan(&existingCoin.CoinName, &existingCoin.PriceUsd, &existingCoin.LastUpdated); err != nil {
-		return nil, err
+	if row.Next() {
+		if err := row.Scan(&existingCoin.CoinName, &existingCoin.PriceUsd, &existingCoin.LastUpdated); err != nil {
+			return nil, err
+		}
+		return &existingCoin, nil
 	}
-	return &existingCoin, nil
+	return nil, sql.ErrNoRows
 }
