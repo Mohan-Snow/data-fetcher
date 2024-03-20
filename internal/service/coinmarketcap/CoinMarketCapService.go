@@ -3,6 +3,7 @@ package coinmarketcap
 import (
 	"data-fetcher/internal"
 	"data-fetcher/internal/model/api/coinmarket"
+	"data-fetcher/internal/model/repo"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -30,6 +31,14 @@ func NewCoinMarketService(
 		cmConfig: cmConfig,
 		client:   http.Client{Transport: transport},
 	}
+}
+
+func (c *coinMarketService) FetchAllData() ([]*repo.CoinMarketEntity, error) {
+	data, err := c.repo.GetAll()
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
 func (c *coinMarketService) FetchDataAndSave(symbols string, token string) (string, error) {

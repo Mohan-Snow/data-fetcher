@@ -35,12 +35,29 @@ func (r postgresRepo) Save(entity *repo.CoinMarketEntity) error {
 	return nil
 }
 
-func (r postgresRepo) GetById(id int) (*repo.CoinMarketEntity, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (r postgresRepo) GetAll() ([]*repo.CoinMarketEntity, error) {
-	//TODO implement me
-	panic("implement me")
+	var coinMarketEntities []*repo.CoinMarketEntity
+	query := sq.Select(
+		"coin_name", "price_usd", "last_updated",
+	).From(
+		"currency",
+	)
+	stmt, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
+	rows, err := r.db.Query(stmt, args...)
+	defer rows.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		entity := new(repo.CoinMarketEntity)
+		if err := rows.Scan(&entity.CoinName, &entity.PriceUsd, &entity.LastUpdated); err != nil {
+			return nil, err
+		}
+		coinMarketEntities = append(coinMarketEntities, entity)
+	}
+	return coinMarketEntities, nil
 }

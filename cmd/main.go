@@ -49,8 +49,9 @@ func main() {
 		IdleConnTimeout:    30 * time.Second,
 		DisableCompression: true,
 	}
-	coinMarketService := coinmarketcap.NewCoinMarketService(repository, *cmConfig, tr)
-	data, err := coinMarketService.FetchDataAndSave("ETH", cmConfig.CoinMarketToken) //  BTC ETH
+	service := coinmarketcap.NewCoinMarketService(repository, *cmConfig, tr)
+	//data, err := service.FetchDataAndSave("ETH", cmConfig.CoinMarketToken) //  BTC ETH
+	data, err := service.FetchAllData()
 	if err != nil {
 		fmt.Println(err)
 	}
